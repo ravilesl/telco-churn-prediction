@@ -1,27 +1,80 @@
-# Predicción de Abandono de Clientes (Telco Churn)
+# Predicción de Abandono de Clientes (Telco Churn Prediction)
 
-Este proyecto desarrolla un pipeline de Machine Learning de extremo a extremo para predecir el abandono de clientes en una compañía de telecomunicaciones. El pipeline está diseñado con una arquitectura modular para asegurar la reproducibilidad, escalabilidad y mantenibilidad.
+Este proyecto implementa un pipeline de **aprendizaje automático** para predecir la tasa de abandono de clientes de una compañía de telecomunicaciones. El objetivo principal es identificar a los clientes en riesgo de irse (`Churn='Yes'`) para que la empresa pueda tomar medidas de retención proactivas.
+
+El proyecto está diseñado con una arquitectura modular y escalable, siguiendo las mejores prácticas de **Ingeniería de MLOps**, lo que facilita su mantenimiento, depuración y la adición de nuevos modelos o características.
 
 ## Arquitectura del Proyecto
-El proyecto está estructurado en directorios modulares que reflejan las diferentes etapas del ciclo de vida de un proyecto de ciencia de datos:
-* `src/utils/`: Contiene módulos para la carga de datos.
-* `src/features/`: Módulos para la ingeniería de características y el preprocesamiento de datos.
-* `src/models/`: Encapsula la lógica de los modelos y utiliza un patrón Factory para la creación de modelos.
-* `src/evaluation/`: Módulo para calcular métricas de rendimiento y generar reportes.
-* `src/pipelines/`: Orquesta las etapas de preprocesamiento, modelado y evaluación en un flujo de trabajo cohesivo.
-* `src/api/`: Contiene el código de la API para operacionalizar el modelo.
-* `tests/`: Módulos para pruebas unitarias.
 
-## Cómo Ejecutar el Proyecto
-Este proyecto es totalmente reproducible. Puedes ejecutarlo en tu entorno local o directamente en Google Colab.
+La estructura del repositorio está organizada para separar las distintas etapas del pipeline de ML:
 
-### Opción 1: Ejecutar Localmente
+- **`main.py`**: El script principal que orquesta todo el flujo de trabajo, desde la carga de datos hasta el entrenamiento y la evaluación de modelos.
+- **`src/`**: Directorio principal que contiene el código fuente del proyecto.
+  - **`data/`**: Contiene la lógica para la carga y gestión de los datos.
+  - **`features/`**: Módulo para el preprocesamiento de datos y la ingeniería de características.
+  - **`models/`**: Contiene las definiciones de los modelos y la lógica para el ajuste de hiperparámetros.
+  - **`pipelines/`**: Módulo que define y ejecuta el pipeline de entrenamiento completo.
+  - **`utils/`**: Funciones de utilidad y herramientas de ayuda.
+- **`notebooks/`**: Cuadernos de Jupyter/Colab para la exploración de datos y la demostración del pipeline.
+- **`models/`**: Carpeta para guardar el modelo entrenado y serializado.
+- **`assets/`**: Almacena los gráficos y las visualizaciones de la evaluación del modelo.
+
+## Archivos y Métodos Clave
+
+A continuación, se describen los componentes principales del proyecto:
+
+### 📁 `src/data/data_loader.py`
+
+- **`load_raw_data(file_path)`**: Función que se encarga de cargar el archivo CSV del dataset.
+
+### 📁 `src/features/feature_engineering.py`
+
+Este módulo es fundamental para preparar los datos. Implementa varias estrategias de preprocesamiento y enriquecimiento:
+
+- **`consolidate_categories(df)`**: Transforma valores como **"No internet service"** y **"No phone service"** a un valor unificado de **"No"**. Esta estrategia simplifica las categorías, reduciendo la dimensionalidad del dataset y ayudando a los modelos a generalizar mejor.
+- **`create_features(df)`**: Aplica **ingeniería de características** para generar nuevas variables a partir de las existentes, como:
+  - **`InternetServiceCount`**: Un conteo de servicios de internet que el cliente tiene contratados.
+  - **`tenure_contract_interaction`**: Una característica de interacción que combina el tiempo de permanencia (`tenure`) con el tipo de contrato, capturando la relación entre estos dos factores.
+- **`preprocess_and_split(df, target)`**: Orquesta las transformaciones de datos, excluye la columna de identificación del cliente y prepara los datos para la entrada del modelo, definiendo las columnas numéricas y categóricas para el `ColumnTransformer`.
+
+### 📁 `src/models/model_factory.py`
+
+Este módulo centraliza la creación y configuración de los modelos de machine learning.
+
+- **`create_model_and_params(model_name)`**: Genera una instancia de un modelo de clasificación (ej. **XGBoost, LightGBM, RandomForest**) y su respectiva grilla de hiperparámetros para la optimización. Se han ajustado los rangos de búsqueda de parámetros para explorar combinaciones que maximicen el rendimiento.
+
+### 📁 `src/pipelines/training_pipeline.py`
+
+El corazón del proyecto, donde se ejecuta el flujo de trabajo completo:
+
+- **Detección de Desbalance de Clases**: El pipeline detecta automáticamente si el dataset está desbalanceado.
+  - Si el desbalance es significativo, la métrica principal de optimización cambia a **`f1-score`** en lugar de `accuracy`. Esto es crucial, ya que el F1-score es más robusto para evaluar el rendimiento en la clase minoritaria (la de abandono), evitando que un modelo trivial con alta precisión pero baja exhaustividad sea seleccionado.
+- **Estrategias de Balanceo de Datos**: Para datasets desbalanceados, se prueban diferentes técnicas de muestreo como **SMOTE**, **ADASYN**, y **Random Oversampling** en conjunto con la optimización de hiperparámetros.
+- **`GridSearchCV`**: Se utiliza para realizar una búsqueda exhaustiva de los mejores hiperparámetros para cada modelo, asegurando el mejor rendimiento posible.
+
+### 📁 `src/evaluation/metrics_evaluator.py`
+
+- **`evaluate_model(y_true, y_pred, model_name)`**: Genera el **reporte de clasificación** y la **matriz de confusión** para el mejor modelo, proporcionando una evaluación detallada de su rendimiento en el conjunto de prueba.
+
+## Estrategias Clave para Lograr Mejores Resultados
+
+1.  **Enfoque en F1-Score**: Se prioriza el F1-Score sobre la precisión, lo que garantiza que el modelo sea capaz de identificar eficazmente a los clientes en riesgo de abandono (alta exhaustividad), sin generar un número excesivo de falsos positivos (buena precisión).
+2.  **Ingeniería de Características**: La creación de características como el conteo de servicios y la interacción de la permanencia y el contrato mejora la capacidad del modelo para capturar relaciones complejas en los datos.
+3.  **Ajuste de Hiperparámetros**: El uso de `GridSearchCV` con rangos de búsqueda ampliados permite encontrar configuraciones óptimas para cada modelo.
+4.  **Enfoque Holístico**: El pipeline evalúa múltiples modelos y técnicas de balanceo de clases de manera sistemática, seleccionando el mejor desempeño global para la predicción final.
+
+
+### Opción 1: ¡Ejecuta el Pipeline en Google Colab!
+
+Puedes ejecutar el pipeline completo, desde la carga de datos hasta la evaluación del mejor modelo, directamente en Google Colab.
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ravilesl/telco-churn-prediction/blob/main/notebooks/colab_runner.ipynb)
+
+Este notebook contiene todo el código necesario, incluyendo la instalación de dependencias, lo que te permite explorar y ejecutar el proyecto sin necesidad de configuraciones locales.
+
+### Opción 2: Ejecutar Localmente
 1.  Clona el repositorio: `git clone https://github.com/tu-usuario/telco-churn-prediction.git`
 2.  Navega a la carpeta del proyecto: `cd telco-churn-prediction`
 3.  Instala las dependencias: `pip install -r requirements.txt`
 4.  Ejecuta el pipeline principal: `python src/main.py`
 5.  Para iniciar la API, ejecuta:  `uvicorn src.api.main_api:app --host 0.0.0.0 --port 8000`
-
-### Opción 2: Ejecutar en Google Colab
-Haz clic en el siguiente enlace para abrir el notebook y ejecutar el pipeline completo en la nube.
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ravilesl/telco-churn-prediction/blob/main/notebooks/colab_runner.ipynb)
