@@ -34,13 +34,13 @@ class ModelFactory:
                     'model__solver': ['liblinear', 'lbfgs']
                 }
             },
-            'svc': {
-                'model': SVC(random_state=42, probability=True),
-                'params': {
-                    'model__C': [0.1, 1, 10, 100],
-                    'model__kernel': ['rbf', 'linear']
-                }
-            },
+            #'svc': {
+            #    'model': SVC(random_state=42, probability=True),
+            #    'params': {
+            #        'model__C': [0.1, 1, 10, 100],
+            #        'model__kernel': ['rbf', 'linear']
+            #    }
+            #},
             'knn': {
                 'model': KNeighborsClassifier(),
                 'params': {
