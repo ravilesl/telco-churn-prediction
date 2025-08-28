@@ -24,4 +24,4 @@ Este proyecto es totalmente reproducible. Puedes ejecutarlo en tu entorno local 
 
 ### Opción 2: Ejecutar en Google Colab
 Haz clic en el siguiente enlace para abrir el notebook y ejecutar el pipeline completo en la nube.
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ravilesl/telco-churn-prediction/notebooks/colab_runner.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ravilesl/telco-churn-prediction/blob/main/notebooks/colab_runner.ipynb)
