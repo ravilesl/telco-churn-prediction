@@ -1,3 +1,5 @@
+# src/evaluation/metrics_evaluator.py
+# Módulo para evaluar el rendimiento del modelo y generar reportes
 from sklearn.metrics import classification_report, f1_score, confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns

@@ -1,3 +1,5 @@
+# Dockerfile para la aplicación FastAPI de predicción de churn
+
 # Usa una imagen base de Python
 FROM python:3.13.5
 

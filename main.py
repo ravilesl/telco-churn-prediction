@@ -1,3 +1,5 @@
+# main.py
+# Punto de entrada principal para ejecutar el pipeline de entrenamiento
 import os
 from src.pipelines.training_pipeline import run_training_pipeline
 

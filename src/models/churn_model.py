@@ -1,3 +1,5 @@
+# src/models/churn_model.py
+# Clase base para modelos de predicción de churn y una implementación concreta con XGBoost
 from abc import ABC, abstractmethod
 import xgboost as xgb
 from typing import Any  

@@ -1,3 +1,5 @@
+# src/utils/data_loader.py
+# Módulo para cargar datos crudos desde archivos CSV
 import pandas as pd
 from typing import Optional
 

@@ -1,3 +1,5 @@
+# src/api/predict_model.py 
+# Módulo para cargar el modelo y realizar predicciones
 import joblib
 import pandas as pd
 from typing import Dict, Any
