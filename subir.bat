@@ -10,7 +10,7 @@ set "version=%date:~-4%.%date:~3,2%.%date:~0,2%-%time:^:=.%"
 set "version=%version:.=%"
 
 rem Mensaje del commit con la versión dinámica
-set "commit_msg=Portafolio v2.%version%"
+set "commit_msg=Telco Churm Prediction v3.%version%"
 
 echo Agregando todos los archivos al staging...
 git add .
