@@ -80,7 +80,6 @@ Este notebook contiene todo el código necesario, incluyendo la instalación de 
 5.  Para iniciar la API, ejecuta:  `uvicorn src.api.main_api:app --host 0.0.0.0 --port 8000`
 6.  Entra a este enlace para confirmar que funciona la API: `http://127.0.0.1:8000/`
 7.  Entra a este enlace para hacer predicciones: `http://127.0.0.1:8000/docs`
-8.  
 
 ### Opción 3: Contenerización con Docker (Recomendado)
 La forma más robusta y consistente de ejecutar la API es usando Docker. Este método asegura que la aplicación se ejecute en un entorno aislado con todas sus dependencias preinstaladas, evitando conflictos de versión.
@@ -103,9 +102,11 @@ La forma más robusta y consistente de ejecutar la API es usando Docker. Este m�
 #### PowerShell
 
 `Set-ExecutionPolicy RemoteSigned -Scope Process`
+
 Una vez que la política de ejecución esté configurada, corre el script de esta manera:
 
 `.\run-docker.ps1`
+
 **Verifica la Ejecución**: El script construirá la imagen y lanzará el contenedor. Verás mensajes en la terminal indicando el progreso. Si la ejecución es exitosa, el script te proporcionará la URL para acceder a la API.
 
 #### Acceso a la API Contenerizada
