@@ -6,6 +6,17 @@ import pandas as pd
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Literal
+import numpy as np  # <-- Added this import
+
+# Importar las funciones de preprocesamiento del proyecto
+from src.features.feature_engineering import create_features, consolidate_categories
+
+# Crear la aplicación FastAPI
+app = FastAPI(
+    title="Telco Churn Prediction API",
+    description="API para predecir el abandono de clientes de telecomunicaciones.",
+    version="1.0.0"
+)
 
 # Definir la ruta del modelo global
 MODEL_PATH = os.path.join(os.path.dirname(__file__), '..', '..', 'models', 'best_overall_model.pkl')
@@ -42,13 +53,12 @@ class ChurnPredictionRequest(BaseModel):
     PaymentMethod: Literal["Electronic check", "Mailed check", "Bank transfer (automatic)", "Credit card (automatic)"]
     MonthlyCharges: float
     TotalCharges: float
-    customerID: str # Se agrega para manejarlo en la API
+    customerID: str 
 
-# Crear la aplicación FastAPI
-app = FastAPI(
-    title="API de Predicción de Abandono de Clientes",
-    description="Una API simple para predecir si un cliente de Telco abandonará o no."
-)
+@app.get("/")
+def read_root():
+    return {"message": "API de predicción de Churn está operativa."}
+
 
 # Definir el endpoint de predicción
 @app.post("/predict")
@@ -57,20 +67,27 @@ def predict_churn(request_data: ChurnPredictionRequest):
         return {"error": "El modelo no se ha cargado correctamente."}
 
     # Convertir los datos de la solicitud a un DataFrame
-    input_df = pd.DataFrame([request_data.dict()])
-
-    # El preprocesador es parte del pipeline y manejará la conversión.
-    # El pipeline completo de GridSearchCV que se guardó se encargará de esto.
+    data_dict = request_data.dict()
+    df = pd.DataFrame([data_dict])
     
-    prediction = best_overall_model.predict(input_df)[0]
+    # SE AÑADE LA GESTIÓN DE COLUMNA customerID
+    if 'customerID' in df.columns:
+        df = df.drop(columns=['customerID'])
+
+    # Aplicar las mismas transformaciones de ingeniería de características
+    df = consolidate_categories(df)
+    df = create_features(df)
+    
+    # Realizar la predicción
+    prediction = best_overall_model.predict(df)[0]
     
     # Obtener las probabilidades de predicción
-    prediction_proba = best_overall_model.predict_proba(input_df)
+    prediction_proba = best_overall_model.predict_proba(df)[0]
 
     # Devolver la predicción
     return {
         "prediccion_churn": "Sí" if prediction == 1 else "No",
-        "probabilidad_no_churn": round(prediction_proba[0][0], 4),
-        "probabilidad_churn": round(prediction_proba[0][1], 4),
+        "probabilidad_no_churn": round(float(prediction_proba[0]), 4),  # <-- Se convierte a float
+        "probabilidad_churn": round(float(prediction_proba[1]), 4),    # <-- Se convierte a float
         "mensaje": "Predicción realizada exitosamente."
     }

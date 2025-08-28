@@ -78,3 +78,5 @@ Este notebook contiene todo el código necesario, incluyendo la instalación de 
 3.  Instala las dependencias: `pip install -r requirements.txt`
 4.  Ejecuta el pipeline principal: `python src/main.py`
 5.  Para iniciar la API, ejecuta:  `uvicorn src.api.main_api:app --host 0.0.0.0 --port 8000`
+6.  Entra a este enlace para confirmar que funciona la API: `http://127.0.0.1:8000/`
+7.  Entra a este enlace para hacer predicciones: `http://127.0.0.1:8000/docs`
