@@ -34,7 +34,7 @@ class ModelFactory:
                     'model__solver': ['liblinear', 'lbfgs']
                 }
             },
-            #'svc': {
+            #'svc': {                                                   La carga computacional de SVC es muy alta
             #    'model': SVC(random_state=42, probability=True),
             #    'params': {
             #        'model__C': [0.1, 1, 10, 100],
